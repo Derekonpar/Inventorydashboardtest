@@ -60,9 +60,9 @@ export default function Sidebar() {
   ];
 
   return (
-    <div className="fixed inset-y-0 left-0 w-64 bg-gray-900 text-white flex flex-col">
-      <div className="flex items-center justify-center h-16 px-4 border-b border-gray-800">
-        <h1 className="text-xl font-bold">Inventory</h1>
+    <div className="fixed inset-y-0 left-0 w-64 bg-gray-100/80 backdrop-blur-lg text-gray-900 flex flex-col border-r border-gray-200/50">
+      <div className="flex items-center justify-center h-16 px-4 border-b border-gray-300/50">
+        <h1 className="text-xl font-bold text-gray-900">On Par Inventory</h1>
       </div>
 
       <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
@@ -76,7 +76,7 @@ export default function Sidebar() {
                 flex items-center justify-between px-4 py-3 rounded-lg transition-colors
                 ${isActive
                   ? 'bg-blue-600 text-white'
-                  : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                  : 'text-gray-700 hover:bg-white/60 hover:text-gray-900'
                 }
               `}
             >
@@ -97,8 +97,8 @@ export default function Sidebar() {
         })}
       </nav>
 
-      <div className="px-4 py-4 border-t border-gray-800">
-        <p className="text-xs text-gray-400 text-center">
+      <div className="px-4 py-4 border-t border-gray-300/50">
+        <p className="text-xs text-gray-600 text-center">
           Real-time Inventory Management
         </p>
       </div>
