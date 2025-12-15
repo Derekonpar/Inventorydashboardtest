@@ -15,8 +15,26 @@ export async function GET() {
     }, { status: 200 });
   } catch (error) {
     console.error('API Error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    
+    // Log more details for debugging
+    console.error('Error details:', {
+      message: errorMessage,
+      stack: errorStack,
+      hasSheetId: !!process.env.GOOGLE_SHEET_ID,
+      hasServiceAccount: !!process.env.GOOGLE_SERVICE_ACCOUNT_JSON,
+      serviceAccountLength: process.env.GOOGLE_SERVICE_ACCOUNT_JSON?.length || 0,
+    });
+    
     return NextResponse.json(
-      { error: 'Failed to fetch sheet data', details: error instanceof Error ? error.message : 'Unknown error' },
+      { 
+        error: 'Failed to fetch sheet data', 
+        details: errorMessage,
+        hint: errorMessage.includes('parse') 
+          ? 'Check that GOOGLE_SERVICE_ACCOUNT_JSON is valid JSON. Make sure to paste the entire JSON file content, including all quotes and brackets.'
+          : undefined
+      },
       { status: 500 }
     );
   }

@@ -7,18 +7,44 @@ export async function getSheetsClient() {
   const serviceAccountPath = process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
 
   if (!serviceAccountKey && !serviceAccountPath) {
-    throw new Error('Google Service Account credentials not found. Set GOOGLE_SERVICE_ACCOUNT_JSON or GOOGLE_SERVICE_ACCOUNT_KEY');
+    throw new Error('Google Service Account credentials not found. SetGOOGLE_SHEET_IDGOOGLE_SERVICE_ACCOUNT_JSON or GOOGLE_SERVICE_ACCOUNT_KEY');
   }
 
   let credentials;
   if (serviceAccountKey) {
     // Parse JSON string from environment variable
     try {
-      credentials = typeof serviceAccountKey === 'string' 
-        ? JSON.parse(serviceAccountKey) 
-        : serviceAccountKey;
+      // Handle both string and already-parsed JSON
+      if (typeof serviceAccountKey === 'string') {
+        // Try parsing as-is first
+        try {
+          credentials = JSON.parse(serviceAccountKey);
+        } catch (parseError) {
+          // If parsing fails, try to fix common issues:
+          // 1. Replace escaped newlines that might have been double-escaped
+          let fixedJson = serviceAccountKey
+            .replace(/\\n/g, '\n')  // Replace \\n with actual newlines
+            .replace(/\\"/g, '"');   // Replace \\" with "
+          
+          // Try parsing again
+          try {
+            credentials = JSON.parse(fixedJson);
+          } catch (secondError) {
+            // If still failing, provide detailed error
+            console.error('JSON Parse Error - Original:', parseError);
+            console.error('JSON Parse Error - After fix:', secondError);
+            console.error('JSON string length:', serviceAccountKey.length);
+            console.error('JSON preview (first 200 chars):', serviceAccountKey.substring(0, 200));
+            throw new Error(`Failed to parse GOOGLE_SERVICE_ACCOUNT_JSON. Make sure it's valid JSON. Error: ${parseError instanceof Error ? parseError.message : 'Unknown error'}`);
+          }
+        }
+      } else {
+        // Already an object
+        credentials = serviceAccountKey;
+      }
     } catch (error) {
-      throw new Error('Failed to parse GOOGLE_SERVICE_ACCOUNT_JSON. Make sure it\'s valid JSON.');
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      throw new Error(`Failed to parse GOOGLE_SERVICE_ACCOUNT_JSON: ${errorMessage}`);
     }
   } else if (serviceAccountPath) {
     // Read from file path (for local development)
